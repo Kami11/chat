@@ -1,0 +1,53 @@
+<html>
+<head>
+    <title>Kiss Chat</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/jquery-ui.min.css">
+    <script src="/static/js/jquery.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/jquery-ui.min.js"></script>
+    <script src="/static/js/chat.js"></script>
+</head>
+<body>
+    <div class="jumbotron text-center">
+      <h1><img src="/static/img/kiss.png" width="100" height="100"> KISS CHAT</h1>
+    </div>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-sm-8">
+          <h3>Chat box:</h3>
+          <textarea readonly id="chatbox" style="min-width: 100%; min-height: 250; resize: none"></textarea>
+          <div style="position:relative;top: 4px">
+            <input type="text" style="min-width: 85%" id="msgin"> <input type="submit" value="send" id="msgbut" style="min-width: 15%">
+          </div>
+        </div>
+        <div class="col-sm-4">
+          <h3>Users online:</h3>
+          <ul class="list-group" id="userlist">
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div id="dialog-form" title="Login">
+       <p class="validateTips">Please enter your username. If you are admin, fill the auth token; otherwise leave it blank.</p>
+       <form>
+        <fieldset>
+          <label for="name">Username:</label>
+          <br>
+          <input type="text" name="name" id="name" value="" class="text ui-widget-content ui-corner-all">
+          <br><br>
+          <label for="token">Token (optional):</label><br>
+          <input type="password" name="token" id="token" value="" class="text ui-widget-content ui-corner-all">
+
+          <!-- Allow form submission with keyboard without duplicating the dialog button -->
+          <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
+        </fieldset>
+      </form>
+    </div>
+
+</body>
+</html>
