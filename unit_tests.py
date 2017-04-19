@@ -1,12 +1,13 @@
 #unit_tests.py
 
 import unittest
+import time
 #from kisschat.server import main
 
 class TestsForAddFunction(unittest.TestCase):
 
     def test_zeros(self):
-        
+        time.sleep(3)
         self.assertEqual(0, 0)
 
 #    def test_one(self):
