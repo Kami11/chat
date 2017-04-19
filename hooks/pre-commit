@@ -7,7 +7,7 @@
 #
 # To enable this hook, rename this file to "pre-commit".
 echo 'Running unit tests...'
-python tests.py 2> unit_test_result 
+python unit_tests.py 2> unit_test_result 
 
 if grep 'OK' unit_test_result > /dev/null
 then 
