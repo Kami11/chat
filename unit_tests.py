@@ -2,15 +2,24 @@
 
 import unittest
 import time
-#from kisschat.server import main
+import datetime
+from kisschat.chat.chatmanager import ChatManager
+from kisschat.chat import aaamanager
 
 class TestsForAddFunction(unittest.TestCase):
 
+
     def test_zeros(self):
+        result = ChatManager.time()
+       	time = datetime.datetime.now().time()
+       	self.assertEqual("[{:02}:{:02}]".format(time.hour, time.minute), result)
+    
+    def test_one(self):
         time.sleep(3)
         self.assertEqual(0, 0)
 
 #    def test_one(self):
+#        time.sleep(3)
 #        result = add_two_numbers(1, 2)
 #        self.assertEqual(3, result)
 #
