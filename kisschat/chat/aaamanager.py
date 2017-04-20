@@ -182,26 +182,5 @@ class AAAManager:
         return self._db.getBannedIps()
 
 
-def main():
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-o", "--output", default="token.hash", help="output file")
-    args = parser.parse_args()
-
-    token = getpass.getpass("Enter your token: ")
-    hash_ = AAAManager.hash(token)
-
-    try:
-        with open(args.output, "w") as f:
-            f.write(hash_)
-    except IOError as exc:
-        print("FATAL: unable to write token hash to {}: {}"
-              .format(args.output, exc.strerror))
-        sys.exit(1)
-    else:
-        print("Token is written to {}".format(args.output))
-        sys.exit(0)
-
-
 if __name__ == "__main__":
     main()
