@@ -23,7 +23,7 @@ class AAAManager:
             Return value:
                 bytes - hashed string with given salt
         '''
-        hash_ = string.encode("utf8")
+        hash_ = hashlib.sha3_512(string.encode("utf8")).digest()
         for b in salt:
             hash_ = hashlib.sha3_512(hash_ + b.to_bytes(1, "big")).digest()
         return hash_
