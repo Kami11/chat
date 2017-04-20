@@ -7,6 +7,7 @@ import getpass
 import logging
 import argparse
 
+import sha3 # monkey patches hashlib
 import observer
 
 from .struct import User
@@ -16,19 +17,25 @@ class AAAManager:
 
 
     @staticmethod
-    def hash(string):
-        utf8 = string.encode("utf8")
-        hash_ = hashlib.sha512(utf8 + b"Inn0p0l1sF0reva&!$#@**").digest()
-        return base64.b64encode(hash_).decode("ascii")
+    def hash(string, salt):
+        '''
+            Hash given string with given salt.
+            Parameters:
+                string - to be hashed;
+                salt - to be hashed with, bytes.
+            Return value:
+                bytes - hashed string with given salt
+        '''
+        hash_ = string.encode("utf8")
+        for b in salt:
+            hash_ = hashlib.sha3_512(hash_ + b.to_bytes(1, "big")).digest()
+        return hash_
 
 
-    def __init__(self, transport, token_hash=None):
+    def __init__(self, transport, db):
 
-        self.token_hash = token_hash
-
+        self._db = db
         self._current_usernames = set()
-        self._banned_usernames = set()
-        self._banned_ips = set()
         self._endpoint_to_user = {}
         self._user_to_endpoint = {}
 
@@ -42,7 +49,7 @@ class AAAManager:
 
 
     def _onConnection(self, endpoint):
-        if endpoint.ip in self._banned_ips:
+        if self._db.isIpBanned(endpoint.ip):
             logging.debug("<{}> tried to connect but banned".format(endpoint.ip))
             endpoint.disconnect()
         else:
@@ -68,29 +75,38 @@ class AAAManager:
 
         try:
             name = request["name"].strip()
-            token = request.get("token")
+            passwd = request["passwd"].strip()
             assert isinstance(name, str) and (not token or isinstance(token, str))
         except (TypeError, KeyError, AttributeError, AssertionError):
             logging.debug("<{}>: invalid auth info format, avorting".format(endpoint.ip))
             return self._abortAuthentication(endpoint)
 
         if name in self._current_usernames:
-            logging.debug("<{}>: username '{}' in use, reject".format(endpoint.ip, name))
-            return self._abortAuthentication(endpoint, "username_in_use")
+            logging.debug("<{}>: user '{}' already logged in, reject".format(endpoint.ip, name))
+            return self._abortAuthentication(endpoint, "user_logged_in")
 
-        if not name or name in self._banned_usernames:
-            logging.debug("<{}>: username '{}' banned, reject".format(endpoint.ip, name))
-            return self._abortAuthentication(endpoint, "username_banned")
+        if not name or self._db.isUsernameBanned(name):
+            logging.debug("<{}>: user '{}' banned, reject".format(endpoint.ip, name))
+            return self._abortAuthentication(endpoint, "user_banned")
 
-        if token and self.hash(token) != self.token_hash:
-            logging.debug("<{}>: wrong auth token, reject".format(endpoint.ip, name))
-            return self._abortAuthentication(endpoint, "authentication_failed")
-        elif token:
-            user_status = User.Status.admin
+        # Try to retreive user from database by name
+        try:
+            user = self._db.getUser(name)
+        except self._db.DoesNotExist:
+            # If user does not exist, create them
+            salt = bytes([random.randrange(256) for _ in range(64)])
+            passwd_hash = self.hash(passwd, salt)
+            user = self._db.createUser(name, User.Status.user, passwd_hash, salt)
         else:
-            user_status = User.Status.user
+            # If user exists, authenticate
+            if self.hash(passwd, user.salt) != user.passwd_hash:
+                logging.debug("<{}>: wrong password, reject".format(endpoint.ip))
+                return self._abortAuthentication(endpoint, "authentication_failed")
 
-        user = User(name, user_status, endpoint.ip)
+        # Add ip address to user object (when retreived from db, user.ip is None)
+        user = user._replace(ip=endpoint.ip) # _replace is NOT private, see Python docs
+
+        # Add user to all needed structures of AAAManager
         self._endpoint_to_user[endpoint] = user
         self._user_to_endpoint[user] = endpoint
         self._current_usernames.add(user.name)
@@ -125,9 +141,8 @@ class AAAManager:
 
 
     def ban(self, username):
-        if username in self._banned_usernames:
+        if not self._db.banUsername(username):
             return False
-        self._banned_usernames.add(username)
         for endpoint, user in tuple(self._endpoint_to_user.items()):
             if user.name == username:
                 endpoint.disconnect()
@@ -136,9 +151,8 @@ class AAAManager:
 
 
     def banip(self, ip):
-        if ip in self._banned_ips:
+        if not self._db.banIp(ip):
             return False
-        self._banned_ips.add(ip)
         for endpoint, user in tuple(self._endpoint_to_user.items()):
             if endpoint.ip == ip:
                 endpoint.disconnect()
@@ -153,29 +167,19 @@ class AAAManager:
 
 
     def unban(self, username):
-        try:
-            self._banned_usernames.remove(username)
-        except KeyError:
-            return False
-        else:
-            return True
+        return self._db.unbanUsername(username)
 
 
     def unbanip(self, ip):
-        try:
-            self._banned_ips.remove(ip)
-        except KeyError:
-            return False
-        else:
-            return True
+        return self._db.unbanIp(ip)
 
 
     def getBannedUsernames(self):
-        return frozenset(self._banned_usernames)
+        return [user.name for user in self._db.getBannedUsers()]
 
 
     def getBannedIps(self):
-        return frozenset(self._banned_ips)
+        return self._db.getBannedIps()
 
 
 def main():

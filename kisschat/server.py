@@ -75,9 +75,15 @@ def main():
         logging.fatal("config file key 'port' should be a positive int < 65536")
         return sys.exit(6)
 
+    # Connect to the database
+    try:
+        db = UserDAO(config["user"], config["passwd"], config["host"],
+                     config["port"], config["db"])
+    except UserDAO.ConnectionError as exc:
+        logging.fatal("connection to database failed: {}".format(exc))
+        return sys.exit(7)
+
     # Make chat stack
-    db = UserDAO(config["user"], config["passwd"], config["host"],
-                 config["port"], config["db"])
     aaa = AAAManager(WSHandler, db)
     chat = ChatManager(aaa)
     cmd = CommandManager(chat)

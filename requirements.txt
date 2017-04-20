@@ -1,3 +1,4 @@
 pattern-observer>=1.0.0
 tornado>=4.4.2
 pyyaml>=3.12
+pysha3>=1.0.2
