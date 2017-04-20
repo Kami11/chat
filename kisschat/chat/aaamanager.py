@@ -98,7 +98,7 @@ class AAAManager:
             passwd_hash = self.hash(passwd, salt)
             try:
                 user = self._db.createUser(name, User.Status.user, passwd_hash, salt)
-            except self._db.InvalidFieldError:
+            except self._db.Error:
                 # Most likely, name is too long. The name length should be
                 # controlled by frontend, so we just abort with no error message
                 return self._abortAuthentication(endpoint)

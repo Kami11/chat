@@ -5,7 +5,7 @@
 from sqlalchemy import create_engine, Table, Column, Integer, Binary, Boolean, \
     String, MetaData, DateTime, Sequence
 from sqlalchemy.sql import select
-from sqlalchemy.exc import OperationalError
+from sqlalchemy.exc import SQLAlchemyError
 
 from .struct import User
 
@@ -64,7 +64,7 @@ class UserDAO:
         # Create tables
         try:
             self._metadata.create_all(self._engine)
-        except OperationalError as exc:
+        except SQLAlchemyError as exc:
             raise self.ConnectionError(str(exc))
 
         # Save connection
@@ -82,25 +82,79 @@ class UserDAO:
                 self.DoesNotExistErorr of there is no user with such name
         '''
         s = select([self._users]).where(self._users.c.name == name)
-        rows = self._conn.execute(s).fetchall()
-        if rows:
-            user = rows[0] # this is SQLAlchemy dict-like object
-            return User(name=user.name, status=user.status, ip=None,
-                        is_banned=user.is_banned, passwd_hash=user.passwd_hash,
-                        passwd_salt=user.passwd_salt)
+        row = self._conn.execute(s).fetchone()
+        if row:
+            return User(name=row.name, status=row.status, ip=None,
+                        is_banned=row.is_banned, passwd_hash=row.passwd_hash,
+                        passwd_salt=row.passwd_salt)
         else:
             raise self.DoesNotExistErorr
 
 
-    def createUser(self, name, status, passwd_hash, salt):
+    def createUser(self, name, status, passwd_hash, passwd_salt, is_banned=False):
         '''
             Add new user to the database.
             Parameters:
                 name - user name, string;
                 status - user status, integer;
                 passwd_hash - user password hash, bytes;
-                salt - user password hash salt, bytes;
+                passwd_salt - user password hash salt, bytes;
+                is_banned - if user is banned, bool.
+            Return value:
+                None
+            Raises:
+                self.InvalidFieldError if one of the fields has invalid value
+                self.Error if failed to insert for some other reason
         '''
+        invalid_fields = self._validateUserEntry(name, status, passwd_hash,
+                                                 passwd_salt, is_banned)
+        if invalid_fields:
+            raise self.InvalidFieldError(invalid_fields)
+        else:
+            row = {"name": name, "status": status, "passwd_hash": passwd_hash,
+                   "passwd_salt": passwd_salt, "is_banned": is_banned}
+            try:
+                self._conn.execute(self._users.insert(), [row])
+            except SQLAlchemyError as exc:
+                raise self.Error(str(exc))
+
+
+    def _validateUserEntry(self, name, status, passwd_hash, passwd_salt, is_banned):
+        '''
+            Check that field values are valid for the db table.
+            Parameters:
+                name - user name, string;
+                status - user status, integer;
+                passwd_hash - user password hash, bytes;
+                passwd_salt - user password hash salt, bytes;
+                is_banned - if user is banned, bool.
+            Return value:
+                list of field names which values are invalid
+        '''
+        # For convenience, create a dict
+        row = {
+            "name": name,
+            "status": status,
+            "passwd_hash": passwd_hash,
+            "passwd_salt": passwd_salt,
+            "is_banned": is_banned
+        }
+        # For readability, create validator functions for each type
+        validators = {
+            String: lambda col, val: isinstance(val, str) and len(val) <= col.type.length,
+            Binary: lambda col, val: isinstance(val, bytes) and len(val) <= col.type.length,
+            Integer: lambda col, val: isinstance(val, int) and (-(2**31) < val < 2**31),
+            Boolean: lambda col, val: isinstance(val, bool)
+        }
+        # Find invalid column values
+        invalid = [] # invalid column names
+        for column in self._users.columns:
+            colname = column.name
+            if colname != "id":
+                value = row[colname]
+                if not validators.get(column.type.__class__)(column, value):
+                    invalid.append(colname)
+        return invalid
 
 
     def isUsernameBanned(self, name):
