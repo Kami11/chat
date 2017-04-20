@@ -1,0 +1,6 @@
+# Example config file (default location: /etc/kisschat.yml)
+user: kiss # database user name
+passwd: matreshka # database user password
+db: kisschat # database name
+host: 127.0.0.1 # dabatase server address
+port: 5432 # dataabse TCP-port
