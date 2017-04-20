@@ -96,7 +96,12 @@ class AAAManager:
             # If user does not exist, create them
             salt = bytes([random.randrange(256) for _ in range(64)])
             passwd_hash = self.hash(passwd, salt)
-            user = self._db.createUser(name, User.Status.user, passwd_hash, salt)
+            try:
+                user = self._db.createUser(name, User.Status.user, passwd_hash, salt)
+            except self._db.InvalidFieldError:
+                # Most likely, name is too long. The name length should be
+                # controlled by frontend, so we just abort with no error message
+                return self._abortAuthentication(endpoint)
         else:
             # If user exists, authenticate
             if self.hash(passwd, user.passwd_salt) != user.passwd_hash:

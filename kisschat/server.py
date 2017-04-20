@@ -82,6 +82,8 @@ def main():
     except UserDAO.ConnectionError as exc:
         logging.fatal("connection to database failed: {}".format(exc))
         return sys.exit(7)
+    else:
+        logging.info("connected to database {}:{}".format(config["host"], config["port"]))
 
     # Make chat stack
     aaa = AAAManager(WSHandler, db)

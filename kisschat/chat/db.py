@@ -7,6 +7,8 @@ from sqlalchemy import create_engine, Table, Column, Integer, Binary, Boolean, \
 from sqlalchemy.sql import select
 from sqlalchemy.exc import OperationalError
 
+from .struct import User
+
 
 class UserDAO:
     '''
@@ -21,7 +23,10 @@ class UserDAO:
     class ConnectionError(Error): pass
 
     # Error if requested object does not exist in the database
-    class DoesNotExist(Error): pass
+    class DoesNotExistErorr(Error): pass
+
+    # Error if trying to create object with onvalid field value
+    class InvalidFieldError(Error): pass
 
 
     def __init__(self, user, passwd, host, port, dbname):
@@ -39,15 +44,16 @@ class UserDAO:
         # Create db engine (but it does not connect at this point)
         engine_str = "mysql+pymysql://{}:{}@{}:{}/{}".format(user, passwd, host,
                                                      port, dbname)
-        self._engine = create_engine(engine_str)
+        self._engine = create_engine(engine_str, isolation_level="READ UNCOMMITTED")
 
         # Define tables
         self._metadata = MetaData()
         self._users = Table('users', self._metadata,
             Column('id', Integer, Sequence('users_id_seq'), primary_key=True),
-            Column('name', String(32), nullable=False),
+            Column('name', String(32), nullable=False, unique=True),
             Column('passwd_hash', Binary(64), nullable=False),
             Column('passwd_salt', Binary(64), nullable=False),
+            Column('status', Integer, nullable=False),
             Column('is_banned', Boolean, index=True, nullable=False),
         )
         self._ips = Table('banned_ips', self._metadata,
@@ -73,8 +79,17 @@ class UserDAO:
             Return value:
                 User object. Note that this object has 'ip' equal to None.
             Raises:
-                self.DoesNotExist of there is no user with such name
+                self.DoesNotExistErorr of there is no user with such name
         '''
+        s = select([self._users]).where(self._users.c.name == name)
+        rows = self._conn.execute(s).fetchall()
+        if rows:
+            user = rows[0] # this is SQLAlchemy dict-like object
+            return User(name=user.name, status=user.status, ip=None,
+                        is_banned=user.is_banned, passwd_hash=user.passwd_hash,
+                        passwd_salt=user.passwd_salt)
+        else:
+            raise self.DoesNotExistErorr
 
 
     def createUser(self, name, status, passwd_hash, salt):
