@@ -2,6 +2,12 @@
     A file that contains all the database logic.
 '''
 
+from sqlalchemy import create_engine, Table, Column, Integer, Binary, Boolean, \
+    String, MetaData, DateTime, Sequence
+from sqlalchemy.sql import select
+from sqlalchemy.exc import OperationalError
+
+
 class UserDAO:
     '''
         This class encapsulates all the interaction with the database
@@ -29,6 +35,34 @@ class UserDAO:
             Raises:
                 self.ConnectionError if failed to establish connection
         '''
+
+        # Create db engine (but it does not connect at this point)
+        engine_str = "mysql+pymysql://{}:{}@{}:{}/{}".format(user, passwd, host,
+                                                     port, dbname)
+        self._engine = create_engine(engine_str)
+
+        # Define tables
+        self._metadata = MetaData()
+        self._users = Table('users', self._metadata,
+            Column('id', Integer, Sequence('users_id_seq'), primary_key=True),
+            Column('name', String(32), nullable=False),
+            Column('passwd_hash', Binary(64), nullable=False),
+            Column('passwd_salt', Binary(64), nullable=False),
+            Column('is_banned', Boolean, index=True, nullable=False),
+        )
+        self._ips = Table('banned_ips', self._metadata,
+            Column('id', Integer, Sequence('ips_id_seq'), primary_key=True),
+            Column('ip', String(15), nullable=False),
+        )
+
+        # Create tables
+        try:
+            self._metadata.create_all(self._engine)
+        except OperationalError as exc:
+            raise self.ConnectionError(str(exc))
+
+        # Save connection
+        self._conn = self._engine.connect()
 
 
     def getUser(self, name):

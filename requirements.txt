@@ -2,3 +2,5 @@ pattern-observer>=1.0.0
 tornado>=4.4.2
 pyyaml>=3.12
 pysha3>=1.0.2
+sqlalchemy>=1.1.4
+pymysql>=0.7.11

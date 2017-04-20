@@ -99,7 +99,7 @@ class AAAManager:
             user = self._db.createUser(name, User.Status.user, passwd_hash, salt)
         else:
             # If user exists, authenticate
-            if self.hash(passwd, user.salt) != user.passwd_hash:
+            if self.hash(passwd, user.passwd_salt) != user.passwd_hash:
                 logging.debug("<{}>: wrong password, reject".format(endpoint.ip))
                 return self._abortAuthentication(endpoint, "authentication_failed")
 
