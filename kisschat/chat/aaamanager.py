@@ -1,11 +1,8 @@
 
 import sys
 import json
-import base64
 import hashlib
-import getpass
 import logging
-import argparse
 
 import sha3 # monkey patches hashlib
 import observer
