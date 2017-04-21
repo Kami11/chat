@@ -1,8 +1,8 @@
 $( function() {
     var websocket, is_loggedin, reject_reason, dialog, form,
       name = $( "#name" ),
-      token = $( "#token" ),
-      allFields = $( [] ).add( name ).add( token ),
+      passwd = $( "#passwd" ),
+      allFields = $( [] ).add( name ).add( passwd ),
       tips = $( ".validateTips" ),
       textarea = $( "#chatbox" ),
       userlist = $( "#userlist" ),
@@ -15,6 +15,7 @@ $( function() {
       allFields.removeClass( "ui-state-error" );
 
       valid = checkLength( name, "username", 3, 16 );
+      valid &= checkLength( passwd, "password", 3, 32 );
 
       if (valid) {
           reject_reason = "";
@@ -68,11 +69,8 @@ $( function() {
 
 
     onWsOpen = function(event) {
-        var msg = '{"name": "' + name.val() + '"'
-        if (token.val()) {
-            msg += ', "token": "' + token.val() + '"'
-        }
-        msg += '}'
+        var msg = '{"name": "' + name.val() + '", ';
+        msg += '"passwd": "' + passwd.val() + '"}'
         websocket.send(msg)
     };
 
@@ -107,12 +105,12 @@ $( function() {
     onWsClose = function(event) {
         var msg;
         dialog.dialog("open");
-        if (reject_reason == "username_in_use") {
-            msg = "Username is already used, please choose a different one.";
-        } else if (reject_reason == "username_banned") {
-            msg = "Username is banned, please choose a different one.";
+        if (reject_reason == "user_logged_in") {
+            msg = "This user is already logged in!";
+        } else if (reject_reason == "user_banned") {
+            msg = "User is banned.";
         } else if (reject_reason == "authentication_failed") {
-            msg = "Token authentication failed. Make sure you entered correct token or leave it empty.";
+            msg = "Incorrect password.";
         } else {
             msg = "You have been disconnected.";
         }

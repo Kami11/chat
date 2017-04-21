@@ -33,15 +33,15 @@
     </div>
 
     <div id="dialog-form" title="Login">
-       <p class="validateTips">Please enter your username. If you are admin, fill the auth token; otherwise leave it blank.</p>
+       <p class="validateTips">Please enter your username and password.</p>
        <form>
         <fieldset>
           <label for="name">Username:</label>
           <br>
           <input type="text" name="name" id="name" value="" class="text ui-widget-content ui-corner-all">
           <br><br>
-          <label for="token">Token (optional):</label><br>
-          <input type="password" name="token" id="token" value="" class="text ui-widget-content ui-corner-all">
+          <label for="token">Password:</label><br>
+          <input type="password" name="passwd" id="passwd" value="" class="text ui-widget-content ui-corner-all">
 
           <!-- Allow form submission with keyboard without duplicating the dialog button -->
           <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">

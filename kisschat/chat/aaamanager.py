@@ -76,7 +76,7 @@ class AAAManager:
             passwd = request["passwd"].strip()
             assert isinstance(name, str) and isinstance(passwd, str)
         except (TypeError, KeyError, AttributeError, AssertionError):
-            logging.debug("<{}>: invalid auth info format, avorting".format(endpoint.ip))
+            logging.debug("<{}>: invalid auth info format, aborting".format(endpoint.ip))
             return self._abortAuthentication(endpoint)
 
         if name in self._current_usernames:
