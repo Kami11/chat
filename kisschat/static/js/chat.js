@@ -131,7 +131,7 @@ $( function() {
             curname = allusers[i];
             to_delete = false;
             for (var j = 0; j < names.length; j++){
-                delname = names[i];
+                delname = names[j];
                 if (curname == delname) {
                     to_delete = true;
                 }

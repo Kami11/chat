@@ -14,7 +14,7 @@ class ChatManager:
 
     admin_greeting = "Welcome, {username}!\n" \
         "You are the Admin. Some magic commands:\n" \
-        " * @who - view list of users currently online" \
+        " * @who - view list of users currently online\n" \
         " * @kick [user] - kick user by username or ip\n" \
         " * @ban [username] - ban username\n" \
         " * @banip [ip] - ban ip address\n" \
