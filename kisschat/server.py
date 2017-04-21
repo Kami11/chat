@@ -113,7 +113,7 @@ def main():
         logging.fatal(exc.strerror)
         return sys.exit(7)
 
-    logging.info("starting server on {}:{}".format(args.address, args.port))
+    logging.info("starting server on {}:{}".format(socket.gethostbyname(socket.gethostname()), args.port))
 
     # Start the server
     try:
