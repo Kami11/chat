@@ -5,6 +5,8 @@ import sys
 import logging
 import argparse
 
+import socket
+
 import yaml
 from tornado import websocket, web, ioloop
 
