@@ -22,9 +22,14 @@
 remote="$1"
 url="$2"
 
-echo remote
-echo url
-echo "pre-push script"
+echo "Build docker image....."
+cp /etc/kisschat.yml ./docker/etc/kisschat.yml
+docker build ./docker/ --no-cache  -t testchat | grep Successfull
+rm ./docker/etc/kisschat.yml
+
+echo "Do not forget run the docker:"
+echo "docker run -it testchat"
+echo ""
 
 exit 0
 
