@@ -1,6 +1,7 @@
 
 import sys
 import json
+import random
 import hashlib
 import logging
 
@@ -73,7 +74,7 @@ class AAAManager:
         try:
             name = request["name"].strip()
             passwd = request["passwd"].strip()
-            assert isinstance(name, str) and (not token or isinstance(token, str))
+            assert isinstance(name, str) and isinstance(passwd, str)
         except (TypeError, KeyError, AttributeError, AssertionError):
             logging.debug("<{}>: invalid auth info format, avorting".format(endpoint.ip))
             return self._abortAuthentication(endpoint)
@@ -89,7 +90,7 @@ class AAAManager:
         # Try to retreive user from database by name
         try:
             user = self._db.getUser(name)
-        except self._db.DoesNotExist:
+        except self._db.DoesNotExistError:
             # If user does not exist, create them
             salt = bytes([random.randrange(256) for _ in range(64)])
             passwd_hash = self.hash(passwd, salt)

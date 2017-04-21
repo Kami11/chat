@@ -23,7 +23,7 @@ class UserDAO:
     class ConnectionError(Error): pass
 
     # Error if requested object does not exist in the database
-    class DoesNotExistErorr(Error): pass
+    class DoesNotExistError(Error): pass
 
     # Error if trying to create object with onvalid field value
     class InvalidFieldError(Error): pass
@@ -79,16 +79,16 @@ class UserDAO:
             Return value:
                 User object. Note that this object has 'ip' equal to None.
             Raises:
-                self.DoesNotExistErorr of there is no user with such name
+                self.DoesNotExistError of there is no user with such name
         '''
         s = select([self._users]).where(self._users.c.name == name)
         row = self._conn.execute(s).fetchone()
         if row:
-            return User(name=row.name, status=row.status, ip=None,
+            return User(name=row.name, status=User.StatusFromInt[row.status],
                         is_banned=row.is_banned, passwd_hash=row.passwd_hash,
-                        passwd_salt=row.passwd_salt)
+                        passwd_salt=row.passwd_salt, ip=None)
         else:
-            raise self.DoesNotExistErorr
+            raise self.DoesNotExistError
 
 
     def createUser(self, name, status, passwd_hash, passwd_salt, is_banned=False):
@@ -101,23 +101,27 @@ class UserDAO:
                 passwd_salt - user password hash salt, bytes;
                 is_banned - if user is banned, bool.
             Return value:
-                None
+                User object that got created
             Raises:
                 self.InvalidFieldError if one of the fields has invalid value
                 self.Error if failed to insert for some other reason
         '''
-        status = status.value # convert enum to int
-        invalid_fields = self._validateUserEntry(name, status, passwd_hash,
+        status_int = status.value # convert enum to int
+        invalid_fields = self._validateUserEntry(name, status_int, passwd_hash,
                                                  passwd_salt, is_banned)
         if invalid_fields:
             raise self.InvalidFieldError(invalid_fields)
         else:
-            row = {"name": name, "status": status, "passwd_hash": passwd_hash,
+            row = {"name": name, "status": status_int, "passwd_hash": passwd_hash,
                    "passwd_salt": passwd_salt, "is_banned": is_banned}
             try:
                 self._conn.execute(self._users.insert(), [row])
             except SQLAlchemyError as exc:
                 raise self.Error(str(exc))
+            else:
+                return User(name=name, status=status, ip=None,
+                            is_banned=is_banned, passwd_hash=passwd_hash,
+                            passwd_salt=passwd_salt)
 
 
     def _validateUserEntry(self, name, status, passwd_hash, passwd_salt, is_banned):
@@ -219,7 +223,7 @@ class UserDAO:
         # Fetch record from database
         try:
             user = self.getUser(name)
-        except self.DoesNotExistErorr:
+        except self.DoesNotExistError:
             return False
         else:
             if not user.is_banned:
@@ -245,8 +249,8 @@ class UserDAO:
         '''
         s = select([self._users]).where(self._users.c.is_banned == True)
         rows = self._conn.execute(s)
-        return [User(name=row.name, status=row.status, ip=None,
-                    is_banned=row.is_banned, passwd_hash=row.passwd_hash,
+        return [User(name=row.name, status=User.StatusFromInt[row.status],
+                    ip=None, is_banned=row.is_banned, passwd_hash=row.passwd_hash,
                     passwd_salt=row.passwd_salt) for row in rows]
 
 

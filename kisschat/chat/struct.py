@@ -23,6 +23,9 @@ class User(namedtuple("UserTuple", ["name", "status", "ip", "is_banned",
         admin = 0
         user = 1
 
+    # Status from int conversion
+    StatusFromInt = {en.value: en for en in Status}
+
 
 class WSEndpoint:
 
