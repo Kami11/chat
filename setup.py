@@ -16,5 +16,5 @@ setup(
     install_requires=[str(r.req) for r in requires if r.req],
     dependency_links=[str(r.link) for r in requires if r.link],
     packages=find_packages(),
-    scripts=['bin/kisschat']
+    scripts=['bin/kisschat', 'bin/kissgrant']
 )

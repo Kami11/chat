@@ -25,7 +25,7 @@ class UserDAO:
     # Error if requested object does not exist in the database
     class DoesNotExistError(Error): pass
 
-    # Error if trying to create object with onvalid field value
+    # Error if trying to create object with invalid field value
     class InvalidFieldError(Error): pass
 
 
@@ -308,3 +308,20 @@ class UserDAO:
         s = select([self._ips.c.ip])
         rows = self._conn.execute(s)
         return [row[0] for row in rows]
+
+
+    def setUserStatus(self, name, status):
+        '''
+            Set status of user with given name. If user does not exist,
+            do nothing.
+            Parameters:
+                name - user name, string;
+                status - enum entry (User.Status).
+            Return value:
+                True if user status was successfully set,
+                False if user does not exist.
+        '''
+        u = self._users.update().where(self._users.c.name == name) \
+                .values(status=status.value)
+        result = self._conn.execute(u)
+        return bool(result.rowcount)

@@ -30,6 +30,45 @@ app = web.Application([
 ], static_path=os.path.join(os.path.dirname(__file__), "static"))
 
 
+def read_config(path):
+    '''
+        Read and parse config file specified by path.
+        If config is invalid, log the error and exit program
+        with non-zero error code.
+        Parameters:
+            path - file location, string.
+        Return value:
+            dict
+    '''
+    # Open file and parse YAML
+    try:
+        with open(path, "r") as f:
+            config = yaml.load(f)
+    except IOError as exc:
+        logging.fatal("unable to open '{}': {}".format(path, exc.strerror))
+        return sys.exit(1)
+    except yaml.error.YAMLError as exc:
+        logging.fatal("yaml error: {}".format(exc))
+        return sys.exit(2)
+
+    # Make sure config has all the required fields
+    if not isinstance(config, dict):
+        logging.fatal("config should be a dict")
+        return sys.exit(3)
+    for key in ["user", "passwd", "host", "port", "db"]:
+        if key not in config:
+            logging.fatal("config file is missing key '{}'".format(key))
+            return sys.exit(4)
+        if key != "port" and not isinstance(config[key], str):
+            logging.fatal("config file key '{}' is not a str".format(key))
+            return sys.exit(5)
+    if not isinstance(config["port"], int) or not (0 < config["port"] < 65536):
+        logging.fatal("config file key 'port' should be a positive int < 65536")
+        return sys.exit(6)
+
+    return config
+
+
 def main():
 
     # Define and parse command line arguments
@@ -50,30 +89,7 @@ def main():
                         format='[%(asctime)s] %(levelname)s: %(message)s')
 
     # Read and parse config file
-    try:
-        with open(args.config, "r") as f:
-            config = yaml.load(f)
-    except IOError as exc:
-        logging.fatal("unable to open '{}': {}".format(args.config, exc.strerror))
-        return sys.exit(1)
-    except yaml.error.YAMLError as exc:
-        logging.fatal("yaml error: {}".format(exc))
-        return sys.exit(2)
-
-    # Make sure config has all the required fields
-    if not isinstance(config, dict):
-        logging.fatal("config should be a dict")
-        return sys.exit(3)
-    for key in ["user", "passwd", "host", "port", "db"]:
-        if key not in config:
-            logging.fatal("config file is missing key '{}'".format(key))
-            return sys.exit(4)
-        if key != "port" and not isinstance(config[key], str):
-            logging.fatal("config file key '{}' is not a str".format(key))
-            return sys.exit(5)
-    if not isinstance(config["port"], int) or not (0 < config["port"] < 65536):
-        logging.fatal("config file key 'port' should be a positive int < 65536")
-        return sys.exit(6)
+    config = read_config(args.config)
 
     # Connect to the database
     try:
