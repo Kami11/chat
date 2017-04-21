@@ -23,9 +23,8 @@ remote="$1"
 url="$2"
 
 echo "Build docker image....."
-echo ""
 cp /etc/kisschat.yml ./docker/etc/kisschat.yml
-docker build ./docker/ --no-cache  -t testchat | grep Successfull
+docker build ./docker/ --no-cache -q -t testchat 
 rm ./docker/etc/kisschat.yml
 
 echo "Do not forget run the docker:"
