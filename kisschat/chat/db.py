@@ -299,3 +299,12 @@ class UserDAO:
         d = self._ips.delete().where(self._ips.c.ip == ip)
         self._conn.execute(d)
         return bool(row)
+
+
+    def getBannedIps(self):
+        '''
+            Return a list of all banned ip addresses (strings).
+        '''
+        s = select([self._ips.c.ip])
+        rows = self._conn.execute(s)
+        return [row[0] for row in rows]
