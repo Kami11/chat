@@ -1,1 +1,4 @@
 After clone run hooks/setuphook script one time  
+$ cd hook/
+$ ./setuphook.sh 
+
