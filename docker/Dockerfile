@@ -2,9 +2,12 @@ FROM bsaifullin/testenv:latest
 
 EXPOSE 8888
 
-COPY /etc/kisschat.yml /etc/kisschat.yml 
+COPY docker/etc/kisschat.yml /etc/kisschat.yml 
 
-RUN git clone https://github.com/Kami11/chat.git
+# RUN git clone https://github.com/Kami11/chat.git
+
+# Use local copy
+ADD ./ /chat/
 
 WORKDIR "/chat"
 

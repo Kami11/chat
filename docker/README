@@ -1,7 +1,7 @@
 To buld docker image:
 ./chat$
   cp /etc/kisschat.yml ./docker/etc/kisschat.yml
-  docker build ./docker/ --no-cache -t testchat
+  docker build -f ./docker/Dockerfile ./ --no-cache -t testchat
 
 To run docker image:
    docker run -it testchat

@@ -24,7 +24,7 @@ url="$2"
 
 echo "Build docker image....."
 cp /etc/kisschat.yml ./docker/etc/kisschat.yml
-docker build ./docker/ --no-cache -q -t testchat 
+docker build -f ./docker/Dockerfile ./ --no-cache -q -t testchat 
 rm ./docker/etc/kisschat.yml
 
 echo "Do not forget run the docker:"
