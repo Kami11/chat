@@ -1,3 +1,5 @@
+Not a real chat, just for stady...
+
 After clone run hooks/setuphook script one time  
 $ cd hook/
 $ ./setuphook.sh 
