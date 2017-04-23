@@ -28,7 +28,7 @@ docker build ./docker/ --no-cache -q -t testchat
 rm ./docker/etc/kisschat.yml
 
 echo "Do not forget run the docker:"
-echo "    docker run -it testchat"
+echo "     docker run -it testchat"
 echo ""
 
 exit 0
