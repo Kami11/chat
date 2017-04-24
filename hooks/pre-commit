@@ -13,6 +13,7 @@ if grep 'OK' unit_test_result > /dev/null
 then 
 	echo 'Unit tests is successful'
 	rm unit_test_result
+	echo 'Running Quality control tests...'
 	pylint -E /chat/aaamanager.py 2> /dev/null > log.txt
 	if  grep "(import-error)" log.txt > /dev/null
 	then 
