@@ -18,10 +18,10 @@ then
 	if  grep "(import-error)" log.txt > /dev/null
 	then 
 		echo "Quality control tests is failed, you cannot commit"
-		rm log.txt
 		exit 1
 	else 
 		echo "Quality control tests is successful"
+		rm log.txt
 		exit 0
 	fi
 	exit 0 
