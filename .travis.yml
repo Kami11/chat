@@ -5,13 +5,16 @@ python:
   # PyPy versions
   - "pypy-5.3.1"
 
-
+before_install:
+  - mysql -u root  -e 'CREATE USER 'kiss'@'localhost' IDENTIFIED BY "matreshka"; GRANT ALL PRIVILEGES ON * . * TO 'kiss'@'localhost';'
+  - mysql -u kiss -pmatreshka -e 'CREATE DATABASE kisschat'
 
 # command to run tests
 script: 
   - pwd
   # Integration testing
-  - python3 unit_tests.py
+  - ./integration_test.sh
+  # - python3 unit_tests.py
 
 # command to install dependencies
 install:
