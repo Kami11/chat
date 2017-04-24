@@ -14,7 +14,7 @@ then
 	echo 'Unit tests is successful'
 	rm unit_test_result
 	echo 'Running Quality control tests...'
-	pylint -E /chat/aaamanager.py 2> /dev/null > log.txt
+	pylint -E kisschat/chat/aaamanager.py 2> /dev/null > log.txt
 	if  grep "(import-error)" log.txt > /dev/null
 	then 
 		echo "Quality control tests is failed, you cannot commit"
