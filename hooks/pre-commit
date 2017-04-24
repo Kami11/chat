@@ -13,6 +13,15 @@ if grep 'OK' unit_test_result > /dev/null
 then 
 	echo 'Unit tests is successful'
 	rm unit_test_result
+	pylint -E /chat/aaamanager.py 2> /dev/null > log.txt
+	if  grep "(import-error)" log.txt > /dev/null
+	then 
+		echo "Quality control tests is failed, you cannot commit"
+		exit 1
+	else 
+		echo "Quality control tests is successful"
+		exit 0
+	fi
 	exit 0 
 else 
 	echo 'The unit tests is failed, you cannot commit' 
