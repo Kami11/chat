@@ -33,7 +33,7 @@ class TestsForAddFunction(unittest.TestCase):
         self.assertEqual(0, 0)
 
     def test_four(self):
-        time.sleep(1)
+        # time.sleep(1)
         self.assertEqual(0, 0)
 
 if __name__ == '__main__':
