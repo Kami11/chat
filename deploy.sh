@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ssh-keyscan -t rsa -H 104.199.24.157 >> ~/.ssh/known_hosts
-ssh -oStrictHostKeyChecking=no -i dd travis@104.199.24.157 << EOF
+ssh -oStrictHostKeyChecking=no -i secret travis@104.199.24.157 << EOF
 
 pwd
 ls -a

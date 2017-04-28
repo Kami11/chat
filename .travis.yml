@@ -9,7 +9,7 @@ before_install:
   - mysql -u root  -e 'CREATE USER 'kiss'@'localhost' IDENTIFIED BY "matreshka"; GRANT ALL PRIVILEGES ON * . * TO 'kiss'@'localhost';'
   - mysql -u kiss -pmatreshka -e 'CREATE DATABASE kisschat'
   - openssl aes-256-cbc -K $encrypted_46c5ed6fee9c_key -iv $encrypted_46c5ed6fee9c_iv -in secret.enc -out secret -d
-
+  - chmod 400 ./secret
 # command to run tests
 script: 
   - pwd
