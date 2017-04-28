@@ -8,6 +8,7 @@ python:
 before_install:
   - mysql -u root  -e 'CREATE USER 'kiss'@'localhost' IDENTIFIED BY "matreshka"; GRANT ALL PRIVILEGES ON * . * TO 'kiss'@'localhost';'
   - mysql -u kiss -pmatreshka -e 'CREATE DATABASE kisschat'
+  - openssl aes-256-cbc -K $encrypted_46c5ed6fee9c_key -iv $encrypted_46c5ed6fee9c_iv -in secret.enc -out secret -d
 
 # command to run tests
 script: 
@@ -25,12 +26,8 @@ install:
 
 after_success:
   - ifconfig
+  - ./deploy.sh
 #  - kisschat -a 0.0.0.0
 
-#did not work(
-#deploy:
-#  provider: puppetforge
-#  user: "bulatsaif"
-#  password:
-#    secure: "eEpdoNLabqZ6f0/fltbL2/NYXGAgd1eYS8tJo+WiV3s+yiv2PYlWq89rGHf7B6vfYWMSb+qZZVxQ4oe+JAzU0PriWaFRB+MVdlyw4w951zB6Y2czllgcswtoSR00Ekhcpj69pPISBiwEJDDU9UozkC2pMVqjyztt3KbqtTA6XV9p6SoeT7StNpTVr97Ey2N9940nZTeQ5SuQssYMyi71gB9e9N7unzBJ/7cGpAd3uuti3bUCkfr3YfeuGKrJlCcXfDqFqebGtZQ7sei5UECsktGszBT1puKth5aVNsD3eCWvWtMgk3K5ASuq8zGhL+NGs/OzjMYRwYk15y9iqNl+/sdPUQHjC0w4jZxhpOsQ435/GDGJaguenjtTpV3RKBPKVahVYORFLJhX6kVLI0p3aR4nRSntolMajPt9ezfWKzdMRW6jgDcYzJc0n08Etn3+AKPnMJOawLPGbmVw17yuB8B22RoZqpv59VEcRIKv7P4V6LeoclorA5Lp+N39X1HOdxzkOUB0kB/JM7aqwTEJJtiZ8wLVKpL+xbZGio726F5powM5Fz+OAb4g/ZSmtGMDImysbZPCLFEsSbDuQNxoLhRBuIt4YtywkSyf5a7LxvoJUjx20Zof1FfoOR6R+wBfqYxT3JFy3gLAABxy3n47qEdekqzm4mwGkhhs3eHaxso="
+
 
