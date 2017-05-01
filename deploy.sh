@@ -22,6 +22,6 @@ echo "/nsudo -H ./setup.py install"
 sudo -H  python3 setup.py install
 
 echo "/n kisschat -a 0.0.0.0 -p 80"
-sudo kisschat -a 0.0.0.0 -p 80
+sudo kisschat -a 0.0.0.0 -p 80 &
 
 EOF
