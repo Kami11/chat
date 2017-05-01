@@ -25,13 +25,8 @@ sudo -H  python3 setup.py install
 
 echo "\n***** sudo killall python3"
 sudo killall python3
-echo "\n***** kisschat -a 0.0.0.0 -p 80"
-sudo kisschat -a 0.0.0.0 -p 80 &
-
-echo "\n***** logout"
-logout
 EOF
-
+ssh -i  secret -t travis@$PREPRODUCTION 'sudo kisschat -a 0.0.0.0 -p 80' &
 
 #############################
 ##  deploy to production   ##
