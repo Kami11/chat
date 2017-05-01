@@ -26,8 +26,8 @@ sudo -H  python3 setup.py install
 echo "\n***** sudo killall python3"
 sudo killall python3
 EOF
-echo "**** ssh -i  secret -t travis@$PREPRODUCTION 'sudo kisschat -a 0.0.0.0 -p 80' &"
-ssh -i  secret -t travis@$PREPRODUCTION 'sudo kisschat -a 0.0.0.0 -p 80' &
+echo "**** ssh -i  secret -t travis@$PREPRODUCTION 'sudo ./chat/bin/kisschat -a 0.0.0.0 -p 80' &"
+ssh -i  secret -t travis@$PREPRODUCTION 'sudo ./chat/bin/kisschat  -a 0.0.0.0 -p 80' &
 sleep 3
 echo "done"
 #############################
