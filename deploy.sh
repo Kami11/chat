@@ -1,15 +1,17 @@
 #!/bin/bash
 
-PRODUCTION=104.199.24.157
-PREPRODUCTION=104.199.24.157
+PRODUCTION=146.148.12.163
+PREPRODUCTION=104.199.46.184
 
-#deploy to prep
-ssh-keyscan -t rsa -H $PRODUCTION >> ~/.ssh/known_hosts
-ssh -oStrictHostKeyChecking=no -i secret travis@$PRODUCTION << EOF
+#deploy to preproduction
+ssh-keyscan -t rsa -H $PREPRODUCTION >> ~/.ssh/known_hosts
+ssh -oStrictHostKeyChecking=no -i secret travis@$PREPRODUCTION << EOF
 
-pwd
-ls -a
 hostname
-echo "I'm inside Google. Here you can run chef or deploy"
+rm -r chat/
+git clone https://github.com/Kami11/chat.git
+cd chat/
+sudo -H ./setup.py install
+kisschat -a 0.0.0.0 -p 80
 
 EOF
