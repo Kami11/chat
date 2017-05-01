@@ -14,7 +14,35 @@ hostname
 echo "***** sudo rm -r chat/"
 sudo rm -r chat/
 
-echo "\n***** git clone https://github.com/Kami11/chat.git"
+echo -e "\n***** git clone https://github.com/Kami11/chat.git"
+git clone https://github.com/Kami11/chat.git
+
+cd chat/
+pwd
+
+echo -e "\n***** sudo -H ./setup.py install"
+sudo -H  python3 setup.py install
+
+echo -e "\n***** sudo killall python3"
+sudo killall python3
+EOF
+echo  "**** ssh -i  secret -t travis@$PREPRODUCTION 'sudo ./chat/bin/kisschat -a 0.0.0.0 -p 80' &"
+ssh -i  secret -t travis@$PREPRODUCTION ' cd chat/ && sudo kisschat -a 0.0.0.0 -p 80 ' &
+sleep 3
+echo "done  deploy to preproduction"
+
+#############################
+##  deploy to production   ##
+#############################
+ssh-keyscan -t rsa -H $PRODUCTION >> ~/.ssh/known_hosts
+ssh -oStrictHostKeyChecking=no -i secret travis@$PRODUCTION << EOF
+echo "***** hostname"
+hostname
+
+echo "***** sudo rm -r chat/"
+sudo rm -r chat/
+
+echo -e "\n***** git clone https://github.com/Kami11/chat.git"
 git clone https://github.com/Kami11/chat.git
 
 cd chat/
@@ -26,11 +54,9 @@ sudo -H  python3 setup.py install
 echo "\n***** sudo killall python3"
 sudo killall python3
 EOF
-echo "**** ssh -i  secret -t travis@$PREPRODUCTION 'sudo ./chat/bin/kisschat -a 0.0.0.0 -p 80' &"
-ssh -i  secret -t travis@$PREPRODUCTION ' cd chat/ && sudo kisschat -a 0.0.0.0 -p 80 ' &
+
+echo "**** ssh -i  secret -t travis@$PRODUCTION 'sudo ./chat/bin/kisschat -a 0.0.0.0 -p 80' &"
+ssh -i  secret -t travis@$PRODUCTION ' cd chat/ && sudo kisschat -a 0.0.0.0 -p 80 ' &
 sleep 3
-echo "done"
-#############################
-##  deploy to production   ##
-#############################
+echo "done deploy to production"
 
