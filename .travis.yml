@@ -29,8 +29,8 @@ after_success:
 #  - ./deploy.sh
 #  - kisschat -a 0.0.0.0
 
-deploy:
-  provider: script
-  script: ./deploy.sh
+#deploy:
+#  provider: script
+#  script: ./deploy.sh
 
 
