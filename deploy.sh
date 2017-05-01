@@ -27,7 +27,7 @@ echo "\n***** sudo killall python3"
 sudo killall python3
 EOF
 echo "**** ssh -i  secret -t travis@$PREPRODUCTION 'sudo ./chat/bin/kisschat -a 0.0.0.0 -p 80' &"
-ssh -i  secret -t travis@$PREPRODUCTION 'sudo ./chat/bin/kisschat  -a 0.0.0.0 -p 80' &
+ssh -i  secret -t travis@$PREPRODUCTION ' cd chat/ && sudo kisschat -a 0.0.0.0 -p 80 ' &
 sleep 3
 echo "done"
 #############################
