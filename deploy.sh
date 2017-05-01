@@ -21,8 +21,8 @@ pwd
 echo "/n*****sudo -H ./setup.py install"
 sudo -H  python3 setup.py install
 
-echo "/n*****sudo killall kisschat"
-sudo killall kisschat
+echo "/n*****sudo killall python3"
+sudo killall python3
 echo "/n*****kisschat -a 0.0.0.0 -p 80"
 sudo kisschat -a 0.0.0.0 -p 80 &
 
