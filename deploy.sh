@@ -3,7 +3,9 @@
 PRODUCTION=146.148.12.163
 PREPRODUCTION=104.199.46.184
 
-#deploy to preproduction
+#############################
+## deploy to preproduction ##
+#############################
 ssh-keyscan -t rsa -H $PREPRODUCTION >> ~/.ssh/known_hosts
 ssh -oStrictHostKeyChecking=no -i secret travis@$PREPRODUCTION << EOF
 echo "***** hostname"
@@ -26,7 +28,11 @@ sudo killall python3
 echo "\n***** kisschat -a 0.0.0.0 -p 80"
 sudo kisschat -a 0.0.0.0 -p 80 &
 
-echo "\n***** exit0"
+echo "\n***** exit"
 exit
-
 EOF
+
+
+#############################
+##  deploy to production   ##
+#############################
