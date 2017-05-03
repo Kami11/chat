@@ -9,7 +9,7 @@ req_path = os.path.join(os.path.dirname(__file__), "requirements.txt")
 # Parse requirements:
 requires = list(pip.req.parse_requirements(req_path, session=pip.download.PipSession()))
 
-#setup(
+setup(
     name='kisschat',
     version='0.1.0',
     description='Simple web chat',
