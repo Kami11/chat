@@ -12,7 +12,7 @@ before_install:
   - chmod 400 ./secret
 # command to run tests
 script: 
-  - pwd
+  #- pwd
   # Integration testing
   - ./integration_test.sh
   # - python3 unit_tests.py
